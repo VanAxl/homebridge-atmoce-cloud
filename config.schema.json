@@ -1,0 +1,53 @@
+{
+  "pluginAlias": "AtmoceCloud",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Atmoce Maison"
+      },
+      "username": {
+        "title": "Atmoce Username / Email",
+        "type": "string",
+        "required": true
+      },
+      "encryptedPassword": {
+        "title": "Encrypted Password",
+        "type": "string",
+        "required": true
+      },
+      "stationName": {
+        "title": "Station Name",
+        "type": "string"
+      },
+      "stationId": {
+        "title": "Station ID",
+        "type": "integer"
+      },
+      "pollIntervalSeconds": {
+        "title": "Polling Interval Seconds",
+        "type": "integer",
+        "default": 60,
+        "minimum": 30
+      },
+      "lowBatteryThresholdPercent": {
+        "title": "Low Battery Threshold Percent",
+        "type": "integer",
+        "default": 20,
+        "minimum": 1,
+        "maximum": 100
+      },
+      "batteryChargedThresholdPercent": {
+        "title": "Battery Charged Threshold Percent",
+        "type": "integer",
+        "default": 90,
+        "minimum": 1,
+        "maximum": 100
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "homebridge-atmoce-cloud",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Atmoce Cloud solar and battery monitoring",
+  "main": "src/index.js",
+  "keywords": [
+    "homebridge-plugin",
+    "atmoce",
+    "solar",
+    "battery",
+    "homekit",
+    "energy"
+  ],
+  "engines": {
+    "homebridge": ">=1.0.0",
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "author": "VanAxl",
+  "license": "MIT",
+  "homepage": "https://github.com/VanAxl/homebridge-atmoce-cloud",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VanAxl/homebridge-atmoce-cloud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VanAxl/homebridge-atmoce-cloud/issues"
+  }
+}
