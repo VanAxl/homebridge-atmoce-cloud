@@ -7,6 +7,9 @@ This plugin connects to the Atmoce Cloud web API, automatically logs in, discove
 > Note: Apple HomeKit does not currently provide a standard public "power sensor" characteristic in watts for Homebridge plugins. For this reason, instantaneous power values are exposed as `LightSensor` values. This is a workaround, but it allows the values to be visible and usable in HomeKit automations.
 
 ---
+<p align="center">
+<img src="https://www.atmocecloud.com/energy/app/static/images/pv-house.fc56ac.png" width="150">
+</p>
 
 ## Features
 
