@@ -59,8 +59,8 @@ npm install -g homebridge-atmoce-cloud
 If installing manually from a local folder:
 
 ```bash
-unzip homebridge-atmoce-cloud-v4.zip
-cd homebridge-atmoce-cloud-v4
+unzip homebridge-atmoce-cloud.zip
+cd homebridge-atmoce-cloud
 npm install
 npm link
 sudo systemctl restart homebridge
@@ -122,6 +122,7 @@ sudo systemctl restart homebridge
 | `stationId` | No | Manual station ID. If set, station discovery is skipped |
 | `pollIntervalSeconds` | No | Refresh interval. Default: `60`, minimum recommended: `30` |
 | `lowBatteryThresholdPercent` | No | Battery level considered low. Default: `20` |
+| `debug` | No | To display debug log in the homebridge console. Default: `No` |
 
 ---
 
