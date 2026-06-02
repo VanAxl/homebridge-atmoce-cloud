@@ -23,7 +23,7 @@
   "homepage": "https://github.com/VanAxl/homebridge-atmoce-cloud",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VanAxl/homebridge-atmoce-cloud.git"
+    "url": "git+https://github.com/VanAxl/homebridge-atmoce-cloud.git"
   },
   "bugs": {
     "url": "https://github.com/VanAxl/homebridge-atmoce-cloud/issues"
