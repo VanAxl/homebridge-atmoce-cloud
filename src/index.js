@@ -350,7 +350,7 @@ class AtmoceCloudPlatform {
     const solarPower = Number(data.generationPower || 0);
     const housePower = Number(data.consumptionPower || 0);
     const gridPower = Number(data.gridPower || 0);
-    const batteryPower = Number(data.storagePower || 0);
+    const batteryPower = Math.abs(Number(data.storagePower || 0));
     const storageStatusName = String(data.storageStatusName || '');
 
     const gridImport = gridPower > 0 ? gridPower : 0;
