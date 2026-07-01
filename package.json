@@ -1,6 +1,6 @@
 {
   "name": "homebridge-atmoce-cloud",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Homebridge plugin for Atmoce Cloud solar and battery monitoring",
   "main": "src/index.js",
   "keywords": [
