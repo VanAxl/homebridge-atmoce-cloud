@@ -83,7 +83,8 @@ sudo systemctl restart homebridge
   "encryptedPassword": "PASTE_ENCRYPTED_PASSWORD_HERE",
   "stationName": "My House",
   "pollIntervalSeconds": 60,
-  "lowBatteryThresholdPercent": 20
+  "lowBatteryThresholdPercent": 20,
+  "debug": false
 }
 ```
 
