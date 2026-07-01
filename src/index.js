@@ -69,7 +69,7 @@ class AtmoceCloudPlatform {
 
   debug(message) {
     if (this.debugEnabled) {
-      this.log(`[DEBUG] ${message}`);
+      this.debug(`[DEBUG] ${message}`);
     }
   }
 
@@ -208,7 +208,7 @@ class AtmoceCloudPlatform {
 
     this.token = response.data.data.prefix + response.data.data.token;
 
-    this.log('Atmoce login OK');
+    this.debug('Atmoce login OK');
     this.debug('Bearer token received');
   }
 
@@ -267,9 +267,9 @@ class AtmoceCloudPlatform {
     } else if (stations.length === 1) {
       selectedStation = stations[0];
     } else {
-      this.log('Multiple stations found:');
+      this.debug('Multiple stations found:');
       stations.forEach((s) => {
-        this.log(`- ${s.stationName} / stationId=${s.stationId}`);
+        this.debug(`- ${s.stationName} / stationId=${s.stationId}`);
       });
 
       throw new Error(
@@ -279,7 +279,7 @@ class AtmoceCloudPlatform {
 
     this.stationId = selectedStation.stationId;
 
-    this.log('Using Atmoce station: ' + selectedStation.stationName);
+    this.debug('Using Atmoce station: ' + selectedStation.stationName);
     this.debug(`Selected stationId=${this.stationId}`);
 
     return this.stationId;
@@ -318,6 +318,7 @@ class AtmoceCloudPlatform {
   }
 
   async refresh() {
+    const start = Date.now();
     this.debug('Refresh cycle started');
 
     try {
@@ -331,7 +332,7 @@ class AtmoceCloudPlatform {
       try {
         data = await this.fetchData();
       } catch (e) {
-        this.log('Token expired or data request failed, re-login...');
+        this.debug('Token expired or data request failed, re-login...');
         this.debug(`First fetch failed: ${e.message}`);
 
         await this.login();
@@ -339,7 +340,9 @@ class AtmoceCloudPlatform {
       }
 
       this.update(data);
-      this.debug('Refresh cycle completed');
+      this.debug(
+        `Refresh cycle completed in ${Date.now() - start} ms`
+      );
     } catch (e) {
       this.log.error('Atmoce refresh failed: ' + e.message);
     }
@@ -413,8 +416,8 @@ class AtmoceCloudPlatform {
       'Battery Discharge'
     );
 
-    this.log(
-      `Atmoce update: Battery=${batterySoc}% BatteryOutlet=${batteryOutletActive} Solar=${solarPower}W House=${housePower}W GridImport=${gridImport}W GridExport=${gridExport}W BatteryCharge=${batteryCharge}W BatteryDischarge=${batteryDischarge}W`
+    this.debug(
+      `Battery=${batterySoc}% BatteryOutlet=${batteryOutletActive} Solar=${solarPower}W House=${housePower}W GridImport=${gridImport}W GridExport=${gridExport}W BatteryCharge=${batteryCharge}W BatteryDischarge=${batteryDischarge}W`
     );
   }
 
