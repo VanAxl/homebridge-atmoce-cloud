@@ -8,7 +8,7 @@ This plugin connects to the Atmoce Cloud web API, automatically logs in, discove
 
 ---
 <p align="center">
-<img src="https://www.atmocecloud.com/energy/app/static/images/pv-house.fc56ac.png" width="400">
+<img src="https://www.atmocecloud.com/energy/app/static/images/pv-house.e909ac.png" width="400">
 </p>
 
 ## Features
