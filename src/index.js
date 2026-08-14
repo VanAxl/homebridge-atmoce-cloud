@@ -69,7 +69,7 @@ class AtmoceCloudPlatform {
 
   debug(message) {
     if (this.debugEnabled) {
-      this.debug(`[DEBUG] ${message}`);
+      this.log(`[DEBUG] ${message}`);
     }
   }
 
