@@ -34,7 +34,7 @@ This plugin connects to the Atmoce Cloud web API, automatically logs in, discove
 
 | Accessory | HomeKit service | Atmoce field | Unit |
 |---|---|---|---|
-| Battery | BatteryService | `storageSoe` | `%` |
+| Battery | Battery | `storageSoe` | `%` |
 | Solar Production | LightSensor | `generationPower` | W, exposed as lux |
 | House Consumption | LightSensor | `consumptionPower` | W, exposed as lux |
 | Grid Flow | LightSensor | `abs(gridPower)` | W, exposed as lux |

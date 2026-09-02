@@ -77,7 +77,7 @@ class AtmoceCloudPlatform {
     this.debug('Creating HomeKit services...');
 
     const batteryOutletService = new Service.Outlet('Atmoce Battery');
-    const batteryService = new Service.BatteryService('Battery Status');
+    const batteryService = new Service.Battery('Battery Status');
     const batteryLevelService = new Service.HumiditySensor(
       'Atmoce Battery Level'
     );
