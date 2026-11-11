@@ -121,7 +121,7 @@ sudo systemctl restart homebridge
 | `platform` | Yes | Must be `AtmoceCloud` |
 | `name` | No | Prefix used for HomeKit accessories |
 | `username` | Yes | Your Atmoce Cloud account email |
-| `encryptedPassword` | Yes | Encrypted password captured from the Atmoce web portal login request |
+| `encryptedPassword` | Yes | Your Atmoce password encoded in Base64 (`echo -n "password" \| base64`) |
 | `stationName` | No | Station name to select if several stations exist |
 | `stationId` | No | Manual station ID. If set, station discovery is skipped |
 | `pollIntervalSeconds` | No | Refresh interval. Default: `60`, minimum recommended: `30` |
@@ -132,60 +132,95 @@ sudo systemctl restart homebridge
 
 ## How to get the encrypted password
 
-Atmoce Cloud does not send your plain password to the API.  
-The web portal encrypts it in the browser before sending the login request.
+The Atmoce Cloud web portal does not send your plain password to the API: it only encodes it in **Base64** before sending the login request (`"encrypted": true`).
 
-You need to copy the encrypted value from Chrome DevTools.
+So you can generate the `encryptedPassword` value with a simple command:
 
-### Step-by-step guide
-
-1. Open Google Chrome.
-2. Go to: `https://www.atmocecloud.com`
-3. Log out if you are already logged in.
-4. Open Chrome DevTools:
-   - macOS: `CMD + OPTION + I`
-   - Windows/Linux: `F12`
-5. Open the **Network** tab.
-6. Enable **Preserve log**.
-7. In the Network filter box, type:
-
-```text
-login
+```bash
+echo -n "PasswordExample" | base64
 ```
 
-8. Log in to your Atmoce Cloud account.
-9. In the Network request list, click the request named:
+Output:
 
 ```text
-login
+UGFzc3dvcmRFeGFtcGxl
 ```
 
-The request URL should look like:
+Paste the result into your Homebridge config:
 
-```text
-https://www.atmocecloud.com/permission-auth/api/login
+```json
+"encryptedPassword": "UGFzc3dvcmRFeGFtcGxl"
 ```
 
-10. Open the **Payload** tab.
-11. Look for a JSON payload similar to:
+> Use `echo -n` (no trailing newline), otherwise the encoded value will be wrong.
+
+### Alternative: copy it from Chrome DevTools
+
+1. Open `https://www.atmocecloud.com` in Chrome and log out if needed.
+2. Open DevTools (`CMD + OPTION + I` on macOS, `F12` on Windows/Linux) → **Network** tab → enable **Preserve log** → filter on `login`.
+3. Log in, click the `login` request (`https://www.atmocecloud.com/permission-auth/api/login`) and open the **Payload** tab.
+4. Copy the value of the `password` field.
+
+---
+
+## Test your credentials with curl (optional)
+
+### Get a Bearer token
+
+```bash
+curl --request POST \
+  --url https://www.atmocecloud.com/permission-auth/api/login \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "username": "my.super@email",
+  "encrypted": true,
+  "password": "<Base64 command result>",
+  "appType": "web"
+}'
+```
+
+### Get your station ID from the token
+
+```bash
+curl --request POST \
+  --url https://www.atmocecloud.com/energy-manage/multipleStation/getDropDownStationList \
+  --header 'Authorization: Bearer <BearerToken from previous request>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "pageIndex": 1,
+  "pageSize": 20
+}'
+```
+
+Example response:
 
 ```json
 {
-  "username": "your@email.com",
-  "encrypted": true,
-  "password": "ENCRYPTED_VALUE_HERE",
-  "appType": "web"
+  "success": true,
+  "code": 200,
+  "msg": "",
+  "data": {
+    "success": true,
+    "data": [
+      {
+        "stationId": 1111,
+        "stationName": "Example",
+        "businessId": "111111111111",
+        "collectState": false,
+        "scene": 1,
+        "style": 0,
+        "miniStation": false
+      }
+    ],
+    "pageIndex": 1,
+    "pageSize": 20,
+    "total": 1,
+    "totalPage": 1
+  }
 }
 ```
 
-12. Copy the value of the `password` field.
-13. Paste it into your Homebridge config as:
-
-```json
-"encryptedPassword": "ENCRYPTED_VALUE_HERE"
-```
-
-Do not copy your plain password. Copy only the already encrypted value shown in the Network payload.
+Use the returned `stationId` as `"stationId"` in your config (or `stationName` as `"stationName"`).
 
 ---
 
@@ -308,7 +343,7 @@ or:
 ### Plugin says: `Unable to discover Atmoce station`
 
 Station discovery endpoint may differ for your account or region.  
-Use Chrome DevTools to find the station ID manually, then set:
+Use the `getDropDownStationList` curl request above (or Chrome DevTools) to find the station ID manually, then set:
 
 ```json
 "stationId": 9825
@@ -323,9 +358,9 @@ The plugin uses LightSensor as a workaround.
 
 ### Login fails after changing password
 
-The encrypted password changes when your Atmoce password changes.
+The encoded password changes when your Atmoce password changes.
 
-Repeat the Chrome DevTools process and update `encryptedPassword`.
+Re-run the `base64` command with your new password and update `encryptedPassword`.
 
 ---
 
@@ -340,7 +375,7 @@ Repeat the Chrome DevTools process and update `encryptedPassword`.
 
 ## Future improvements
 
-- Reproduce the browser-side password encryption directly in the plugin
+- Accept the plain password in the config and encode it in the plugin
 - Better station discovery once all endpoint variants are known
 - Optional MQTT export
 - Optional Eve/HomeKit custom history support
@@ -351,9 +386,9 @@ Repeat the Chrome DevTools process and update `encryptedPassword`.
 
 ## Security notes
 
-The `encryptedPassword` is not your plain password, but it can still be used to obtain a valid Atmoce session token.
+The `encryptedPassword` is only Base64-encoded: it is **not** encryption and can be decoded trivially back to your plain password.
 
-Treat it as sensitive.
+Treat it exactly like your real password.
 
 Do not share your Homebridge config publicly.
 
