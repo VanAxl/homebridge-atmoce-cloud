@@ -49,6 +49,8 @@ class AtmoceCloudPlatform {
       this.config.batteryChargedThresholdPercent || 90
     );
 
+    this.showBattery = this.config.showBattery !== false;
+
     this.pollIntervalSeconds = Math.max(
       Number(this.config.pollIntervalSeconds || 60),
       30
@@ -61,6 +63,7 @@ class AtmoceCloudPlatform {
     this.debug(`stationId=${this.stationId}`);
     this.debug(`stationName=${this.stationName}`);
     this.debug(`pollIntervalSeconds=${this.pollIntervalSeconds}`);
+    this.debug(`showBattery=${this.showBattery}`);
     this.debug(`lowBatteryThresholdPercent=${this.lowBatteryThresholdPercent}`);
     this.debug(
       `batteryChargedThresholdPercent=${this.batteryChargedThresholdPercent}`
@@ -76,57 +79,66 @@ class AtmoceCloudPlatform {
   accessories(callback) {
     this.debug('Creating HomeKit services...');
 
-    const batteryOutletService = new Service.Outlet('Atmoce Battery');
-    const batteryService = new Service.Battery('Battery Status');
-    const batteryLevelService = new Service.HumiditySensor(
-      'Atmoce Battery Level'
-    );
-
     const solarService = new Service.LightSensor('Atmoce Solar Production');
     const houseService = new Service.LightSensor('Atmoce House Consumption');
     const gridImportService = new Service.LightSensor('Atmoce Grid Import');
     const gridExportService = new Service.LightSensor('Atmoce Grid Export');
-    const batteryChargeService = new Service.LightSensor(
-      'Atmoce Battery Charge'
-    );
-    const batteryDischargeService = new Service.LightSensor(
-      'Atmoce Battery Discharge'
-    );
-
-    this.prepareOutlet(batteryOutletService);
-    this.prepareHumiditySensor(batteryLevelService);
 
     this.prepareLightSensor(solarService);
     this.prepareLightSensor(houseService);
     this.prepareLightSensor(gridImportService);
     this.prepareLightSensor(gridExportService);
-    this.prepareLightSensor(batteryChargeService);
-    this.prepareLightSensor(batteryDischargeService);
-
-    this.services.batteryOutlet = batteryOutletService;
-    this.services.battery = batteryService;
-    this.services.batteryLevel = batteryLevelService;
 
     this.services.solar = solarService;
     this.services.house = houseService;
     this.services.gridImport = gridImportService;
     this.services.gridExport = gridExportService;
-    this.services.batteryCharge = batteryChargeService;
-    this.services.batteryDischarge = batteryDischargeService;
 
     const accessories = [
-      new AtmoceAccessory('Atmoce Battery', [
-        batteryOutletService,
-        batteryService,
-      ]),
-      new AtmoceAccessory('Atmoce Battery Level', batteryLevelService),
       new AtmoceAccessory('Atmoce Solar Production', solarService),
       new AtmoceAccessory('Atmoce House Consumption', houseService),
       new AtmoceAccessory('Atmoce Grid Import', gridImportService),
       new AtmoceAccessory('Atmoce Grid Export', gridExportService),
-      new AtmoceAccessory('Atmoce Battery Charge', batteryChargeService),
-      new AtmoceAccessory('Atmoce Battery Discharge', batteryDischargeService),
     ];
+
+    if (this.showBattery) {
+      const batteryOutletService = new Service.Outlet('Atmoce Battery');
+      const batteryService = new Service.Battery('Battery Status');
+      const batteryLevelService = new Service.HumiditySensor(
+        'Atmoce Battery Level'
+      );
+      const batteryChargeService = new Service.LightSensor(
+        'Atmoce Battery Charge'
+      );
+      const batteryDischargeService = new Service.LightSensor(
+        'Atmoce Battery Discharge'
+      );
+
+      this.prepareOutlet(batteryOutletService);
+      this.prepareHumiditySensor(batteryLevelService);
+      this.prepareLightSensor(batteryChargeService);
+      this.prepareLightSensor(batteryDischargeService);
+
+      this.services.batteryOutlet = batteryOutletService;
+      this.services.battery = batteryService;
+      this.services.batteryLevel = batteryLevelService;
+      this.services.batteryCharge = batteryChargeService;
+      this.services.batteryDischarge = batteryDischargeService;
+
+      accessories.unshift(
+        new AtmoceAccessory('Atmoce Battery', [
+          batteryOutletService,
+          batteryService,
+        ]),
+        new AtmoceAccessory('Atmoce Battery Level', batteryLevelService)
+      );
+      accessories.push(
+        new AtmoceAccessory('Atmoce Battery Charge', batteryChargeService),
+        new AtmoceAccessory('Atmoce Battery Discharge', batteryDischargeService)
+      );
+    } else {
+      this.debug('Battery accessories disabled (showBattery=false)');
+    }
 
     this.debug(`Publishing ${accessories.length} accessories to Homebridge`);
     accessories.forEach((a) => this.debug(`Accessory created: ${a.name}`));
@@ -381,40 +393,44 @@ class AtmoceCloudPlatform {
     this.debug(`batteryDischarge=${batteryDischarge}`);
     this.debug(`batteryOutletActive=${batteryOutletActive}`);
 
-    this.services.batteryOutlet
-      .setCharacteristic(Characteristic.On, batteryOutletActive)
-      .setCharacteristic(Characteristic.OutletInUse, batteryOutletActive);
+    if (this.showBattery) {
+      this.services.batteryOutlet
+        .setCharacteristic(Characteristic.On, batteryOutletActive)
+        .setCharacteristic(Characteristic.OutletInUse, batteryOutletActive);
 
-    this.services.battery
-      .setCharacteristic(Characteristic.BatteryLevel, batterySoc)
-      .setCharacteristic(
-        Characteristic.ChargingState,
-        storageStatusName === 'Charging'
-          ? Characteristic.ChargingState.CHARGING
-          : Characteristic.ChargingState.NOT_CHARGING
-      )
-      .setCharacteristic(
-        Characteristic.StatusLowBattery,
-        batterySoc <= this.lowBatteryThresholdPercent
-          ? Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
-          : Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL
+      this.services.battery
+        .setCharacteristic(Characteristic.BatteryLevel, batterySoc)
+        .setCharacteristic(
+          Characteristic.ChargingState,
+          storageStatusName === 'Charging'
+            ? Characteristic.ChargingState.CHARGING
+            : Characteristic.ChargingState.NOT_CHARGING
+        )
+        .setCharacteristic(
+          Characteristic.StatusLowBattery,
+          batterySoc <= this.lowBatteryThresholdPercent
+            ? Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
+            : Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL
+        );
+
+      this.services.batteryLevel.setCharacteristic(
+        Characteristic.CurrentRelativeHumidity,
+        Math.max(0, Math.min(100, batterySoc))
       );
-
-    this.services.batteryLevel.setCharacteristic(
-      Characteristic.CurrentRelativeHumidity,
-      Math.max(0, Math.min(100, batterySoc))
-    );
+    }
 
     this.setLux(this.services.solar, solarPower, 'Solar Production');
     this.setLux(this.services.house, housePower, 'House Consumption');
     this.setLux(this.services.gridImport, gridImport, 'Grid Import');
     this.setLux(this.services.gridExport, gridExport, 'Grid Export');
-    this.setLux(this.services.batteryCharge, batteryCharge, 'Battery Charge');
-    this.setLux(
-      this.services.batteryDischarge,
-      batteryDischarge,
-      'Battery Discharge'
-    );
+    if (this.showBattery) {
+      this.setLux(this.services.batteryCharge, batteryCharge, 'Battery Charge');
+      this.setLux(
+        this.services.batteryDischarge,
+        batteryDischarge,
+        'Battery Discharge'
+      );
+    }
 
     this.debug(
       `Battery=${batterySoc}% BatteryOutlet=${batteryOutletActive} Solar=${solarPower}W House=${housePower}W GridImport=${gridImport}W GridExport=${gridExport}W BatteryCharge=${batteryCharge}W BatteryDischarge=${batteryDischarge}W`

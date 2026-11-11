@@ -125,6 +125,7 @@ sudo systemctl restart homebridge
 | `stationName` | No | Station name to select if several stations exist |
 | `stationId` | No | Manual station ID. If set, station discovery is skipped |
 | `pollIntervalSeconds` | No | Refresh interval. Default: `60`, minimum recommended: `30` |
+| `showBattery` | No | Set to `false` to hide all battery accessories (battery, level, charge, discharge). Default: `true` |
 | `lowBatteryThresholdPercent` | No | Battery level considered low. Default: `20` |
 | `debug` | No | To display debug log in the homebridge console. Default: `No` |
 

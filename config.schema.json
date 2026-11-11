@@ -34,6 +34,12 @@
         "default": 60,
         "minimum": 30
       },
+      "showBattery": {
+        "title": "Show Battery Accessories",
+        "type": "boolean",
+        "default": true,
+        "description": "Uncheck if you have no battery or do not want battery accessories in HomeKit."
+      },
       "lowBatteryThresholdPercent": {
         "title": "Low Battery Threshold Percent",
         "type": "integer",
